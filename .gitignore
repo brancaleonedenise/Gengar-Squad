@@ -1,0 +1,23 @@
+Python cache files
+
+pycache/
+*.pyc
+
+Data files (These should be on Kaggle Datasets, not GitHub)
+
+Data/
+*.jsonl
+
+Submission outputs and saved models
+
+submissions/
+*.joblib
+
+Jupyter Notebook checkpoints
+
+.ipynb_checkpoints/
+
+OS-specific files
+
+.DS_Store
+Thumbs.db
