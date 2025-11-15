@@ -1,4 +1,4 @@
-from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_classif
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, RobustScaler, OneHotEncoder
@@ -45,7 +45,7 @@ def get_pipeline(model_name: str, numerical_features: list, categorical_features
 
     # Categorical transformer
     if categorical_features:
-        transformers.append(('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features))
+        transformers.append(('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), categorical_features))
 
     if transformers:
         preprocessor = ColumnTransformer(transformers)
@@ -73,6 +73,7 @@ def get_pipeline(model_name: str, numerical_features: list, categorical_features
     pipeline = Pipeline([
         ('preprocessor', preprocessor),
         ('remove_constant_features', VarianceThreshold(threshold=0)),
+        ('selectkbest', SelectKBest(score_func=f_classif)),
         ('classifier', model)
     ])
     
