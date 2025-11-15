@@ -71,8 +71,8 @@ def get_pipeline(model_name: str, numerical_features: list, categorical_features
     
     # Build pipeline
     pipeline = Pipeline([
-        ('remove_constant_features', VarianceThreshold(threshold=0)),
         ('preprocessor', preprocessor),
+        ('remove_constant_features', VarianceThreshold(threshold=0)),
         ('classifier', model)
     ])
     

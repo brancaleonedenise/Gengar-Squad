@@ -27,7 +27,7 @@ def run_grid_search(pipeline, X_train, y_train, param_grid, cv=5, scoring='accur
         cv=cv,
         scoring=scorer,
         n_jobs=-1,
-        verbose=1
+        verbose=3
     )
     grid.fit(X_train, y_train)
 
