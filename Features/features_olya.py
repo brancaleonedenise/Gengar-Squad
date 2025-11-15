@@ -157,8 +157,6 @@ def create_advanced_features_gen2(df):
 
         # --- Basic numeric features ---
         feat_lead_speed_diff = p1_lead['base_spe'] - p2_lead['base_spe']
-        
-        
         feat_end_boost_diff = 0
         feat_total_damage_dealt = 0
         feat_total_healing_done = 0
@@ -328,40 +326,38 @@ def create_advanced_features_gen2(df):
         feat_stall_ratio = sum(1 for c in hp_changes if c < 5) / len(hp_changes) if hp_changes else 0
         feat_aggression_index = (1 - feat_stall_ratio) * (abs(np.mean(np.diff(hp_diff_series))) if len(hp_diff_series) > 1 else 0)
 
-        feat_team_emb_sim = np.dot(p1_seen_encoded, p2_seen_encoded) / (
-            np.linalg.norm(p1_seen_encoded) * np.linalg.norm(p2_seen_encoded) + 1e-6
-        )
-    
+
+        # --- Combine all features ---
         # --- Combine all features ---
         feature_dict = {
             'battle_id': row['battle_id'],
-            'lead_speed_diff': feat_lead_speed_diff,                 
-            'hp_advantage_seen': feat_hp_advantage_seen,             
-            'mons_revealed_diff': feat_mons_revealed_diff,           
-            'team_status_diff': feat_team_status_diff,             
-            'end_boost_diff': feat_end_boost_diff,                 
-            'total_damage_dealt': feat_total_damage_dealt,           
-            'total_healing_done': feat_total_healing_done,         
-            'status_turns': feat_status_turns,                       
-            'first_faint_turn': feat_first_faint_turn,               
-            'lead_type_adv': feat_lead_type_adv,                   
-            'meta_diff': feat_meta_diff,                           
-            'status_setup_diff': feat_status_setup_diff,           
-            'p1_seen_pokemons': p1_seen_encoded,                   
-            'p2_seen_pokemons': p2_seen_encoded,                   
-            'total_stats_diff': feat_total_stats_diff,              
-            'damage_diff_turn10': feat_damage_diff_turn25,           
+            'lead_speed_diff': feat_lead_speed_diff,                 # ✅ top 10
+            'hp_advantage_seen': feat_hp_advantage_seen,             # ✅ top 10
+            'mons_revealed_diff': feat_mons_revealed_diff,           # ✅ top 10
+            'team_status_diff': feat_team_status_diff,             # ❌ not top 10
+            'end_boost_diff': feat_end_boost_diff,                 # ❌ not top 10
+            'total_damage_dealt': feat_total_damage_dealt,           # ✅ top 10
+            'total_healing_done': feat_total_healing_done,         # ❌ not top 10
+            'status_turns': feat_status_turns,                       # ✅ top 10
+            'first_faint_turn': feat_first_faint_turn,               # ✅ top 10
+            'lead_type_adv': feat_lead_type_adv,                   # ❌ not top 10
+            'meta_diff': feat_meta_diff,                           # ❌ not top 10
+            'status_setup_diff': feat_status_setup_diff,           # ❌ not top 10
+            'p1_seen_pokemons': p1_seen_encoded,                   # ❌ not top 10
+            'p2_seen_pokemons': p2_seen_encoded,                   # ❌ not top 10
+            'total_stats_diff': feat_total_stats_diff,              # ✅ top 10
+            'damage_diff_turn10': feat_damage_diff_turn25,           # ✅ top 10
             'damage_diff_turn20': feat_damage_diff_turn30,
-            'damage_diff_turn25': feat_damage_diff_turn25,           
-            'damage_diff_turn30': feat_damage_diff_turn30,           
-            'hp_trend_diff': feat_hp_trend_diff,                     
-            'feat_switch_diff': feat_switch_diff,                  
-            'feat_aggression_diff': feat_aggression_diff,          
+            'damage_diff_turn25': feat_damage_diff_turn25,           # ✅ top 10
+            'damage_diff_turn30': feat_damage_diff_turn30,           # ✅ top 10
+            'hp_trend_diff': feat_hp_trend_diff,                     # ✅ top 10
+            'feat_switch_diff': feat_switch_diff,                  # ❌ not top 10
+            'feat_aggression_diff': feat_aggression_diff,          # ❌ not top 10
             'hp_diff_std': feat_hp_diff_std,
             'hp_diff_range': feat_hp_diff_range,
             'momentum_shift_turn': feat_momentum_shift_turn,
-            #'comeback_score': feat_comeback_score,
-            #'early_sustain': feat_early_sustain,
+            'comeback_score': feat_comeback_score,
+            'early_sustain': feat_early_sustain,
             'status_balance': feat_status_balance,
             'boost_volatility': feat_boost_volatility,
             'boost_trend': feat_boost_trend,
@@ -369,7 +365,6 @@ def create_advanced_features_gen2(df):
             'move_diversity_diff': feat_move_diversity_diff,
             'stall_ratio': feat_stall_ratio,
             'aggression_index': feat_aggression_index,
-            'feat_team_emb_sim': feat_team_emb_sim
         }
 
         feature_dict['stats_speed_interaction'] = feat_total_stats_diff * feat_lead_speed_diff
@@ -379,17 +374,34 @@ def create_advanced_features_gen2(df):
         feature_dict['damage_ratio_turn10_20'] = feat_damage_diff_turn10 / feat_damage_diff_turn20 if feat_damage_diff_turn20 != 0 else 0
         feature_dict['damage_ratio_turn10_30'] = feat_damage_diff_turn10 / feat_damage_diff_turn30 if feat_damage_diff_turn30 != 0 else 0
         
+        feature_dict['p1_lead_special_total'] = p1_lead['base_spa'] + p1_lead['base_spd']
+        feature_dict['p2_lead_special_total'] = p2_lead['base_spa'] + p2_lead['base_spd']
+        feature_dict['special_total_diff'] = feature_dict['p1_lead_special_total'] - feature_dict['p2_lead_special_total']
+
         
+        feature_dict['p1_lead_physical_total'] = p1_lead['base_atk'] + p1_lead['base_def']
+        feature_dict['p2_lead_physical_total'] = p2_lead['base_atk'] + p2_lead['base_def']
+        feature_dict['physical_total_diff'] = feature_dict['p1_lead_physical_total'] - feature_dict['p2_lead_physical_total']
         feature_dict['atk_def_ratio_p1'] = p1_lead['base_atk'] / (p1_lead['base_def'] + 1)
         feature_dict['atk_def_ratio_p2'] = p2_lead['base_atk'] / (p2_lead['base_def'] + 1)
         
         feature_dict['hp_speed_interaction_lead'] = p1_lead['base_hp'] * p1_lead['base_spe']
         feature_dict['hp_def_ratio_p1'] = p1_lead['base_hp'] / (p1_lead['base_def'] + 1)
         feature_dict['hp_def_ratio_p2'] = p2_lead['base_hp'] / (p2_lead['base_def'] + 1)
-   
-      
-        
+        feature_dict['hp_vs_total_stats_p1'] = p1_lead['base_hp'] / (sum([p1_lead[stat] for stat in ['base_atk','base_def','base_spa','base_spd','base_spe']]) + 1)
+        feature_dict['hp_vs_total_stats_p2'] = p2_lead['base_hp'] / (sum([p2_lead[stat] for stat in ['base_atk','base_def','base_spa','base_spd','base_spe']]) + 1)
 
+        
+        feature_dict['lead_total_stats_p1'] = sum([p1_lead[stat] for stat in ['base_hp','base_atk','base_def','base_spa','base_spd','base_spe']])
+        feature_dict['lead_total_stats_p2'] = sum([p2_lead[stat] for stat in ['base_hp','base_atk','base_def','base_spa','base_spd','base_spe']])
+
+        feature_dict['atk_hp_ratio_p1'] = p1_lead['base_atk'] / (p1_lead['base_hp'] + 1)
+        feature_dict['atk_hp_ratio_p2'] = p2_lead['base_atk'] / (p2_lead['base_hp'] + 1)
+        feature_dict['def_hp_ratio_p1'] = p1_lead['base_def'] / (p1_lead['base_hp'] + 1)
+        feature_dict['def_hp_ratio_p2'] = p2_lead['base_def'] / (p2_lead['base_hp'] + 1)
+
+        # HP trend difference (you already compute this as feat_hp_trend_diff)
+        feature_dict['feat_hp_trend_diff'] = feat_hp_trend_diff
 
         # Status inflicted difference
         feat_status_inflicted = sum(1 for s in p2_seen_status.values() if s['status'])
@@ -475,7 +487,15 @@ def create_advanced_features_gen2(df):
             feature_dict[f'p1_team_emb_{i}'] = val
         for i, val in enumerate(p2_team_emb):
             feature_dict[f'p2_team_emb_{i}'] = val
-                
+
+        
+        
+        
+        # Embeddings
+        for stat_name, val in zip(['hp','atk','def','spa','spd','spe'], p1_lead_embedding):
+            feature_dict[f'p1_lead_{stat_name}'] = val
+        for stat_name, val in zip(['hp','atk','def','spa','spd','spe'], p2_lead_embedding):
+            feature_dict[f'p2_lead_{stat_name}'] = val
 
         processed_data.append(feature_dict)
 

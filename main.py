@@ -187,7 +187,7 @@ def load_data(data_dir=None):
     )
 
     train_df = train_df[filtro_livello_100]
-
+    
     print("✓ train.jsonl loaded successfully. Shape:", train_df.shape)
     print("✓ test.jsonl loaded successfully. Shape:", test_df.shape)
 
