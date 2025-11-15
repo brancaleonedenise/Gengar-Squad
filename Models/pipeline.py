@@ -1,3 +1,4 @@
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, RobustScaler, OneHotEncoder
@@ -70,6 +71,7 @@ def get_pipeline(model_name: str, numerical_features: list, categorical_features
     
     # Build pipeline
     pipeline = Pipeline([
+        ('remove_constant_features', VarianceThreshold(threshold=0)),
         ('preprocessor', preprocessor),
         ('classifier', model)
     ])
