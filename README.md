@@ -1,8 +1,10 @@
+![til](Images/gengar_squad.gif)
+
 # Gengar-Squad: Pokémon Battle Outcome Prediction
 
 This project builds a complete machine-learning pipeline for predicting the outcome of Generation 2 Pokémon battles using structured JSON battle logs. It includes feature engineering, multiple model pipelines, hyperparameter optimization, and ensemble methods.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Gengar-Squad/
@@ -45,7 +47,7 @@ Gengar-Squad/
 
 ---
 
-## 🧩 Problem Description
+## Problem Description
 
 The goal is to predict whether **Player 1 wins the battle** (`player_won`) based on:
 
@@ -54,11 +56,11 @@ The goal is to predict whether **Player 1 wins the battle** (`player_won`) based
 * A detailed per-turn battle timeline (moves, statuses, damage trends, boosts, effects)
 * Battle metadata
 
-The data comes in deeply nested JSON structures and requires extensive feature engineering before model training.
+The data comes in deeply nested JSON structures.
 
 ---
 
-## 🔧 Core Components
+## Core Components
 
 ### **1. Feature Engineering**
 
@@ -74,6 +76,7 @@ They convert raw nested battle logs into a flattened, model-ready DataFrame, ext
 
 * Base stat features
 * Type encodings
+* Skills/Attacks
 * Timeline statistics (damage dealt, turn count, boosts, statuses)
 * Team and lead summary features
 
@@ -135,6 +138,8 @@ Used to combine the best optimized versions of:
 * Logistic Regression
 * Gradient Boosting
 
+OBS: Only used in Olya's and Denise's notebooks
+
 ---
 
 ### **5. Submission Pipeline**
@@ -157,6 +162,7 @@ pip install -r requirements.txt
 
 
 ### **3. Train a model pipeline**
+Ex:
 
 ```python
 from Models.pipeline import get_pipeline
@@ -165,7 +171,8 @@ pipeline = get_pipeline("xgboost", numerical_features=feature_list, scaler="fals
 pipeline.fit(X_train, y_train)
 ```
 
-### **4. Optimize using Optuna**
+### **4. Optimize using Optuna or GridSearch**
+Ex:
 
 ```python
 from optimisers.optuna_optimizer import optimize_optuna
@@ -197,7 +204,7 @@ python Submission/submit.py
 
 ---
 
-## 📊 Performance Evaluation
+## Performance Evaluation
 
 All models are evaluated using:
 
@@ -206,7 +213,7 @@ All models are evaluated using:
 
 ---
 
-## 🧠 Notebooks
+## Notebooks
 
 Three exploratory notebooks demonstrate each team member’s feature and model experimentation:
 
@@ -216,7 +223,7 @@ Three exploratory notebooks demonstrate each team member’s feature and model e
 
 ---
 
-## 🤝 Contributors
+## Contributors
 
 * **Olya**
 * **Denise**
